@@ -10,6 +10,9 @@ function App() {
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const tasksPerPage = 10;
+  const [search, setSearch] = useState("");
 
   // Runs an API action and shows its error in the banner if it fails
   const run = async (action) => {
@@ -59,7 +62,20 @@ function App() {
       setTodos((prev) => prev.filter((t) => !t.completed));
     });
 
-  const filteredTodos = todos.filter(FILTERS[filter].test);
+ const filteredTodos = todos
+  .filter(FILTERS[filter].test)
+  .filter((todo) =>
+    todo.title.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredTodos.length / tasksPerPage);
+
+  const startIndex = (currentPage - 1) * tasksPerPage;
+
+  const currentTodos = filteredTodos.slice(
+  startIndex,
+  startIndex + tasksPerPage
+  );
 
   return (
     <div className="layout">
@@ -79,6 +95,16 @@ function App() {
         </header>
 
         <TodoForm onAdd={handleAdd} />
+        <div className="search-bar">
+  <span className="search-icon">🔍</span>
+
+  <input
+    type="text"
+    placeholder="Search tasks..."
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+  />
+</div>
 
         {error && (
           <div className="error" role="alert">
@@ -101,8 +127,9 @@ function App() {
             </p>
           </div>
         ) : (
+          <div>
           <ul className="todo-list">
-            {filteredTodos.map((todo) => (
+            {currentTodos.map((todo) => (
               <TodoItem
                 key={todo._id}
                 todo={todo}
@@ -111,6 +138,26 @@ function App() {
               />
             ))}
           </ul>
+          <div className="pagination">
+  <button
+    onClick={() => setCurrentPage(currentPage - 1)}
+    disabled={currentPage === 1}
+  >
+    Previous
+  </button>
+
+  <span>
+    Page {currentPage} of {totalPages}
+  </span>
+
+  <button
+    onClick={() => setCurrentPage(currentPage + 1)}
+    disabled={currentPage === totalPages}
+  >
+    Next
+  </button>
+</div>
+        </div>
         )}
       </main>
     </div>
