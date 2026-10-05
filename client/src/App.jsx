@@ -11,7 +11,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const tasksPerPage = 10;
+  const tasksPerPage = 5;
   const [search, setSearch] = useState("");
 
   // Runs an API action and shows its error in the banner if it fails
